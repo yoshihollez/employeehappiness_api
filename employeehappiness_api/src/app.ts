@@ -12,6 +12,9 @@ import { EmployeeHappinessResolver } from "./resolvers/employeeHappiness";
 import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
+import { createConnection } from "typeorm";
+import { User } from "./entities/User";
+import { Happiness } from "./entities/Happiness";
 
 dotenv.config();
 const PORT: string = process.env.PORT || "";
@@ -20,6 +23,18 @@ const main = async () => {
   const orm = await MikroORM.init(microConfig);
   orm.getMigrator().up();
   const app: express.Application = express();
+
+  const conn = await createConnection({
+    type: "mysql",
+    database: "test",
+    username: "root",
+    password: "",
+    url: "",
+    logging: true,
+    synchronize: true, // (not in production)
+    // migrations: [path.join(__dirname, "./migrations/*")],
+    entities: [User, Happiness],
+  });
 
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient(6373);
