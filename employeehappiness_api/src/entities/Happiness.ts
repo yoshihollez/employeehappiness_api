@@ -9,7 +9,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
-
+import { FieldError, MyContext } from "../types";
+import { DateType } from "@mikro-orm/core";
 enum moods {
   sattisfied,
   neutral,
@@ -24,17 +25,20 @@ export class Happiness extends BaseEntity {
   id!: number;
 
   @Field()
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column()
+  createdAt!: string;
 
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
+  // @Field()
+  // @UpdateDateColumn()
+  // updatedAt: Date;
 
   @Field()
   @Column()
   mood!: string;
 
-  @ManyToOne(() => User, (user) => user.moods)
+  @Column()
+  userId!: string;
+
+  @ManyToOne(() => User, (user) => user.happiness)
   user: User;
 }
