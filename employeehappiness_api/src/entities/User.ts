@@ -1,33 +1,37 @@
-import { OneToMany } from "@mikro-orm/core";
+// imports
 import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Happiness } from "./Happiness";
 
+// user table
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn("uuid")
-  id!: number;
-
-  @Field()
-  @Column()
-  name!: string;
+  id!: string;
 
   @Field()
   @Column({ unique: true })
-  email!: string;
+  username!: string;
+
+  // @Field()
+  // @Column({ unique: true })
+  // email!: string;
 
   @Column()
   password!: string;
+
+  @OneToMany(() => Happiness, (happiness) => happiness.mood)
+  happiness: Happiness[];
 
   @Field()
   @CreateDateColumn()
@@ -36,7 +40,4 @@ export class User extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => Happiness, (happiness) => happiness.user)
-  moods: Happiness[];
 }
