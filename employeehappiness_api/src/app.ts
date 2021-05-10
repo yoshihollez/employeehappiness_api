@@ -17,6 +17,10 @@ import { Happiness } from "./entities/Happiness";
 // dotenv data
 dotenv.config();
 const PORT: string = process.env.PORT || "4000";
+const DATABASE_NAME: string = process.env.DATABASENAME || "employeehappiness";
+const DATABSE_USER: string = process.env.DATABSE_USER || "root";
+const DATABASE_PASSWORD: string = process.env.DATABASE_PASSWORD || "";
+const REDIS_IP: number = Number(process.env.REDIS_IP) || 6373;
 
 // everything is placed in a main class so async can be used.
 const main = async () => {
@@ -25,9 +29,9 @@ const main = async () => {
   // connection for database with typeorm
   const conn = await createConnection({
     type: "mysql",
-    database: "employeehappiness",
-    username: "root",
-    password: "",
+    database: DATABASE_NAME,
+    username: DATABSE_USER,
+    password: DATABASE_PASSWORD,
     url: "",
     logging: true,
     synchronize: true, // automatically updates the database tables, disable in production.
@@ -36,7 +40,7 @@ const main = async () => {
   });
   // redis setup, used to store sessiondata
   const RedisStore = connectRedis(session);
-  const redisClient = redis.createClient(6373);
+  const redisClient = redis.createClient(REDIS_IP);
 
   var routesArray = ["/login", "/rating", "/statistics", "/graphql"];
 
@@ -64,7 +68,7 @@ const main = async () => {
   // cors setup
   app.use(
     cors({
-      origin: "http://localhost:3000/",
+      origin: `http://${process.env.WEBSITE_IP}:${process.env.WEBSITE_PORT}/`,
       credentials: true,
       preflightContinue: true,
     })
@@ -84,7 +88,9 @@ const main = async () => {
   apolloServer.applyMiddleware({
     app,
     // if you put / at the end of 3000 the cookie wil not be set.
-    cors: { origin: "http://localhost:3000" },
+    cors: {
+      origin: `http://${process.env.WEBSITE_IP}:${process.env.WEBSITE_PORT}`,
+    },
   });
 
   // sets up server with port from dotenv or default 4000
